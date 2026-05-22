@@ -1,0 +1,4 @@
+<?php
+namespace App\Http\Controllers\Api;
+use App\Http\Controllers\Controller; use App\Http\Requests\TimeBlockStoreRequest; use App\Http\Requests\TimeBlockUpdateRequest; use App\Http\Resources\TimeBlockResource; use App\Models\TimeBlock;
+class TimeBlockController extends Controller { public function index(){return TimeBlockResource::collection(TimeBlock::where('business_id',request()->user()->business_id)->get());} public function store(TimeBlockStoreRequest $r){$m=TimeBlock::create($r->validated()+['business_id'=>$r->user()->business_id]);return (new TimeBlockResource($m))->response()->setStatusCode(201);} public function update(TimeBlockUpdateRequest $r, TimeBlock $timeBlock){abort_unless($timeBlock->business_id===$r->user()->business_id,403);$timeBlock->update($r->validated());return new TimeBlockResource($timeBlock);} }

@@ -1,0 +1,4 @@
+<?php
+namespace App\Http\Controllers\Api;
+use App\Http\Controllers\Controller; use App\Http\Requests\AppointmentStoreRequest; use App\Http\Requests\AppointmentUpdateRequest; use App\Http\Resources\AppointmentResource; use App\Models\Appointment;
+class AppointmentController extends Controller { public function index(){return AppointmentResource::collection(Appointment::where('business_id',request()->user()->business_id)->get());} public function store(AppointmentStoreRequest $r){$m=Appointment::create($r->validated()+['business_id'=>$r->user()->business_id]);return (new AppointmentResource($m))->response()->setStatusCode(201);} public function update(AppointmentUpdateRequest $r, Appointment $appointment){abort_unless($appointment->business_id===$r->user()->business_id,403);$appointment->update($r->validated());return new AppointmentResource($appointment);} }
