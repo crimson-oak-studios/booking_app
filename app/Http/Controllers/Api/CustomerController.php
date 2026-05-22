@@ -1,0 +1,4 @@
+<?php
+namespace App\Http\Controllers\Api;
+use App\Http\Controllers\Controller; use App\Http\Requests\CustomerStoreRequest; use App\Http\Requests\CustomerUpdateRequest; use App\Http\Resources\CustomerResource; use App\Models\Customer;
+class CustomerController extends Controller { public function index(){return CustomerResource::collection(Customer::where('business_id',request()->user()->business_id)->get());} public function store(CustomerStoreRequest $r){$data=$r->validated();$m=Customer::firstOrCreate(['business_id'=>$r->user()->business_id,'email'=>$data['email']],$data+['business_id'=>$r->user()->business_id]);if(!$m->wasRecentlyCreated)$m->update($data);return (new CustomerResource($m))->response()->setStatusCode(201);} public function update(CustomerUpdateRequest $r, Customer $customer){abort_unless($customer->business_id===$r->user()->business_id,403);$customer->update($r->validated());return new CustomerResource($customer);} }

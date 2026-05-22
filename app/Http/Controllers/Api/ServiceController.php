@@ -1,0 +1,4 @@
+<?php
+namespace App\Http\Controllers\Api;
+use App\Http\Controllers\Controller; use App\Http\Requests\ServiceStoreRequest; use App\Http\Requests\ServiceUpdateRequest; use App\Http\Resources\ServiceResource; use App\Models\Service;
+class ServiceController extends Controller { public function index(){return ServiceResource::collection(Service::where('business_id',request()->user()->business_id)->get());} public function store(ServiceStoreRequest $r){$m=Service::create($r->validated()+['business_id'=>$r->user()->business_id]);return (new ServiceResource($m))->response()->setStatusCode(201);} public function update(ServiceUpdateRequest $r, Service $service){abort_unless($service->business_id===$r->user()->business_id,403);$service->update($r->validated());return new ServiceResource($service);} public function destroy(Service $service){abort_unless($service->business_id===request()->user()->business_id,403);$service->delete();return response()->noContent();}}
