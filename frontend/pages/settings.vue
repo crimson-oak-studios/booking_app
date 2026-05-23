@@ -11,7 +11,7 @@
             </div>
             <div>
               <h2 class="text-lg font-bold text-zinc-950">Email reminder</h2>
-              <p class="mt-1 text-sm text-zinc-600">24 hours before appointment</p>
+              <p class="mt-1 text-sm text-zinc-600">Reminder email is sent 24 hours before appointment.</p>
             </div>
           </div>
         </div>

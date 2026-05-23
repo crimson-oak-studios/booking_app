@@ -49,6 +49,7 @@
                     Edit
                   </UButton>
                   <UButton
+                    v-if="canCancelAppointment(appointment)"
                     color="error"
                     variant="ghost"
                     icon="i-lucide-ban"
@@ -142,7 +143,7 @@
         </label>
 
         <UButton type="submit" color="primary" icon="i-lucide-save" :loading="isSaving" :disabled="customers.length === 0 || activeServices.length === 0">
-          {{ editingAppointment ? 'Update appointment' : 'Create appointment' }}
+          {{ hasPersistedAppointmentId(editingAppointment) ? 'Save appointment' : 'Create appointment' }}
         </UButton>
       </form>
     </section>
@@ -279,6 +280,14 @@ function appointmentPayload(appointment?: Appointment) {
   }
 }
 
+function hasPersistedAppointmentId(appointment: Appointment | null): boolean {
+  return Number.isInteger(appointment?.id) && Number(appointment?.id) > 0
+}
+
+function canCancelAppointment(appointment: Appointment): boolean {
+  return hasPersistedAppointmentId(appointment)
+}
+
 async function refreshAppointments() {
   await appointmentsRequest.refresh()
 }
@@ -289,9 +298,10 @@ async function saveAppointment() {
   isSaving.value = true
 
   try {
-    const endpoint = editingAppointment.value ? `/api/appointments/${editingAppointment.value.id}` : '/api/appointments'
+    const isExistingAppointment = hasPersistedAppointmentId(editingAppointment.value)
+    const endpoint = isExistingAppointment ? `/api/appointments/${editingAppointment.value?.id}` : '/api/appointments'
     const request = await useSanctumFetch(endpoint, {
-      method: editingAppointment.value ? 'PUT' : 'POST',
+      method: isExistingAppointment ? 'PUT' : 'POST',
       body: appointmentPayload(editingAppointment.value || undefined),
       key: `appointment-save-${Date.now()}`,
       server: false,
@@ -302,7 +312,7 @@ async function saveAppointment() {
       throw request.error.value
     }
 
-    successMessage.value = editingAppointment.value ? 'Appointment updated.' : 'Appointment created.'
+    successMessage.value = isExistingAppointment ? 'Appointment updated.' : 'Appointment created.'
     resetForm()
     await refreshAppointments()
   } catch (saveError) {
@@ -313,6 +323,11 @@ async function saveAppointment() {
 }
 
 async function cancelAppointment(appointment: Appointment) {
+  if (!hasPersistedAppointmentId(appointment)) {
+    errorMessage.value = 'Only saved appointments can be cancelled.'
+    return
+  }
+
   errorMessage.value = ''
   successMessage.value = ''
   cancellingId.value = appointment.id

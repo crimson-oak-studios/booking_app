@@ -95,12 +95,23 @@ async function bookAppointment() {
     }
 
     const response = request.data.value
-    successMessage.value = 'Appointment request created.'
+    const appointmentId = Number(response?.appointment_id || 0)
+    const paymentUrl = String(response?.payment_url || response?.paymentUrl || '').trim()
+
+    if (!Number.isInteger(appointmentId) || appointmentId <= 0) {
+      throw new Error('Booking id was not returned.')
+    }
+
+    if (!paymentUrl) {
+      throw new Error('Payment link was not returned.')
+    }
+
+    successMessage.value = 'Appointment request created. Continue to payment.'
     await router.push({
       path: '/public/checkout',
       query: {
-        appointment_id: response?.appointment_id,
-        payment_url: response?.payment_url
+        appointment_id: appointmentId,
+        payment_url: paymentUrl
       }
     })
   } catch (bookingError) {

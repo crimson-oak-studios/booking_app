@@ -77,7 +77,8 @@ export interface TimeBlock {
 
 export interface BookingResponse {
   appointment_id: number
-  payment_url: string
+  payment_url?: string
+  paymentUrl?: string
 }
 
 export interface ValidationErrors {

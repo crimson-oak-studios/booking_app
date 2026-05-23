@@ -2,6 +2,14 @@
 
 Nuxt frontend for the appointment management SaaS MVP. The Laravel backend remains at the repository root.
 
+## Implementation notes
+
+- Frontend dependencies are declared in `frontend/package.json`:
+  - `nuxt`: `^4.4.6`
+  - `@nuxt/ui`: `^4.8.0`
+  - `nuxt-auth-sanctum`: `^2.3.4`
+- Auth is implemented with `nuxt-auth-sanctum`, route middleware (`sanctum:auth` / `sanctum:guest`), and `useSanctumFetch()` for API calls.
+
 ## Setup
 
 Use Node `^22.12.0`, `^24.11.0`, or `>=26.0.0` for Nuxt 4.
